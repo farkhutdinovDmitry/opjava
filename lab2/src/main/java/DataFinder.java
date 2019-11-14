@@ -10,21 +10,20 @@ public class DataFinder {
     private final static int BUFFER_SIZE = 4000;
     private List<Path> haystack;
     private String needle;
-    private CharBuffer buffer;
 
     public DataFinder(List<Path> haystack, String needle) {
         this.haystack = haystack;
         this.needle = needle;
-        buffer = CharBuffer.allocate(BUFFER_SIZE < needle.length() ? BUFFER_SIZE + needle.length() : BUFFER_SIZE);
     }
 
     public List<Path> find() throws IOException {
         List<Path> containers = new ArrayList<>();
         for (Path path : haystack) {
+            CharBuffer buffer = CharBuffer.allocate(BUFFER_SIZE < needle.length() ? BUFFER_SIZE + needle.length() : BUFFER_SIZE);
             FileReader fileReader = new FileReader(path.toFile());
             BufferedReader reader = new BufferedReader(fileReader);
-            int read = reader.read(buffer);
             StringSearcher stringSearcher = new StringSearcher(needle);
+            int read = reader.read(buffer);
             while (read != -1) {
                 if (stringSearcher.find(buffer.array())) {
                     containers.add(path);
