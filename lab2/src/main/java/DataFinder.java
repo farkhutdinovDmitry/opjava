@@ -1,35 +1,39 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.CharBuffer;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 public class DataFinder {
-    private final static int BUFFER_SIZE = 10000;
+    private final static int BUFFER_SIZE = 4000;
     private List<Path> haystack;
     private String needle;
-    private char[] buffer;
+    private CharBuffer buffer;
 
     public DataFinder(List<Path> haystack, String needle) {
         this.haystack = haystack;
         this.needle = needle;
-        buffer = new char[BUFFER_SIZE];
+        buffer = CharBuffer.allocate(BUFFER_SIZE < needle.length() ? BUFFER_SIZE + needle.length() : BUFFER_SIZE);
     }
 
-    public void find() throws IOException {
+    public List<Path> find() throws IOException {
+        List<Path> containers = new ArrayList<>();
         for (Path path : haystack) {
             FileReader fileReader = new FileReader(path.toFile());
             BufferedReader reader = new BufferedReader(fileReader);
             int read = reader.read(buffer);
-            BoyerMoore boyerMoore = new BoyerMoore(needle);
+            StringSearcher stringSearcher = new StringSearcher(needle);
             while (read != -1) {
-                if (boyerMoore.find(buffer)) {
-                    System.out.println("Found in " + path);
+                if (stringSearcher.find(buffer.array())) {
+                    containers.add(path);
                     break;
                 }
+                buffer.clear();
                 read = reader.read(buffer);
             }
         }
-
+        return containers;
     }
 }

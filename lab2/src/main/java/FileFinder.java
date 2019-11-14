@@ -23,6 +23,10 @@ public class FileFinder {
             Files.walkFileTree(start, new SimpleFileVisitor<>() {
                 @Override
                 public FileVisitResult visitFile(Path path, BasicFileAttributes fileAttributes) {
+                    if (fileName == null) {
+                        founds.add(path);
+                        return FileVisitResult.CONTINUE;
+                    }
                     if (getFileNameOnly(path).equals(fileName)) {
                         founds.add(path);
                     }
